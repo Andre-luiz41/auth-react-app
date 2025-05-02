@@ -1,0 +1,5 @@
+/backend/AuthBackend/bin
+/backend/AuthBackend/obj
+/backend/AuthBackend/Auth.db
+node_modules
+build
