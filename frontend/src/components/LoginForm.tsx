@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { API_URL } from '@/lib/constants';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -36,37 +36,58 @@ const LoginForm = () => {
 
     try {
       // Testar a conexão com o backend antes de tentar fazer login
-      const testConnection = await fetch(`${API_URL}/api/health`, { 
+      const testConnection = await fetch(`${API_BASE_URL}/health`, { // Corrigido: Usar API_BASE_URL
         method: 'GET',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
       }).catch(() => null);
-      
+
       if (!testConnection) {
         console.error('Erro de conexão: API inacessível');
-        setError(`Não foi possível conectar ao servidor (${API_URL}). Verifique se o backend está ativo.`);
+        setError(`Não foi possível conectar ao servidor (${API_BASE_URL}). Verifique se o backend está ativo.`);
         toast({
-          title: "Erro de conexão",
-          description: "Não foi possível conectar ao servidor. Verifique se o backend está acessível.",
-          variant: "destructive",
+          title: 'Erro de conexão',
+          description: 'Não foi possível conectar ao servidor. Verifique se o backend está acessível.',
+          variant: 'destructive',
         });
         setLoading(false);
         return;
       }
 
+      const response = await fetch(`${API_BASE_URL}/auth/login`, { // Corrigido: Usar API_BASE_URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Erro ao fazer login. Verifique suas credenciais.');
+        toast({
+          title: 'Erro ao fazer login',
+          description: errorData.message || 'Verifique seu email e senha.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
+      await response.json(); // Removed unused 'data' variable
       const success = await login(email, password);
 
       if (success) {
         navigate(from, { replace: true });
       } else {
-        setError('Email ou senha inválidos');
+        setError('Email ou senha inválidos'); // Este erro pode ser redundante, mas mantive
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro de login:', err);
       setError('Erro de conexão ao servidor. Verifique se a API está acessível.');
       toast({
-        title: "Erro de conexão",
-        description: "Não foi possível conectar ao servidor. Verifique a URL da API.",
-        variant: "destructive",
+        title: 'Erro de conexão',
+        description: 'Não foi possível conectar ao servidor. Verifique a URL da API.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);

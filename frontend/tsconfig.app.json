@@ -1,3 +1,4 @@
+
 {
   "compilerOptions": {
     "target": "ES2020",
@@ -5,22 +6,17 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "strict": true,  // Alterado de false para true
+    "noUnusedLocals": true, // Alterado de false para true
+    "noUnusedParameters": true, // Alterado de false para true
     "noImplicitAny": false,
-    "noFallthroughCasesInSwitch": false,
-
+    "noFallthroughCasesInSwitch": true, // Alterado de false para true
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
